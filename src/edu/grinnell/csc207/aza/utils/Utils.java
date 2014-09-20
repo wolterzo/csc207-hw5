@@ -65,26 +65,49 @@ public class Utils
       } // if p is odd.
   } // expt(int,int)
 
+  /**
+   * 
+   * @param x
+   * @param p
+   * @return
+   */
   public static int expt(int x, int p)
   {
-    int soFar = x;
-    while (p > 0) 
+    int total = x;
+    int exp = 1;
+
+    if (p == 0)
       {
-        if (p == 1)
+        return 1;
+      } //if
+    while (exp < p)
+      {
+        if ((p - exp) % 2 == 0 && exp * 2 <= p)
           {
-            
-          }
-      }
-    return 1;
+            total = total * total;
+            exp = exp * 2;
+          } // if even and not too large
+        else
+          {
+            total = x * total;
+            exp++;
+          } // else
+      } // while
+    return total;
   } // expt(int, int)
+
   public static void main(String[] args)
     throws Exception
   {
 
     BigDecimal test = new BigDecimal(100);
-
+    int n = 5;
+    int p = 100;
+    System.out.println(n + "^" + p + " = " + Utils.expt(n, p));
+    /*
     System.out.println("Printing answer "
                        + Utils.sqrt(test, new BigDecimal(0.00001)));
+                       */
 
   }
 
