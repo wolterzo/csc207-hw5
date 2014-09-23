@@ -8,7 +8,7 @@ public class Utils
 {
 
   /** 
-   * 
+   * Find the square root of a given BigDecimal d with the precision of epsilon.
    * @param d
    * @param epsilon
    * @return the result of the approximation
@@ -17,9 +17,10 @@ public class Utils
   public static BigDecimal sqrt(BigDecimal d, BigDecimal epsilon)
   {
     // approximation is d/2.00000000000 
-    MathContext precision = new MathContext(5, RoundingMode.HALF_UP);
-    BigDecimal approximation = d.divide(new BigDecimal(2.0, precision));
-    BigDecimal quotient = d.divide(approximation, precision);
+    int scale = epsilon.scale();
+    RoundingMode round = RoundingMode.HALF_UP;
+    BigDecimal approximation = d.divide(new BigDecimal(2.0), scale, round);
+    BigDecimal quotient = d.divide(approximation, scale, round);
     Boolean good = false;
 
     while (!good)
@@ -27,43 +28,18 @@ public class Utils
         if (quotient.subtract(approximation).abs().compareTo(epsilon) < 0)
           {
             good = true;
-          }
+          } // if 
         else
           {
-            quotient = d.divide(approximation, precision);
+            quotient = d.divide(approximation, scale, round);
             approximation =
-                approximation.add(quotient).divide(new BigDecimal(2.0,
-                                                                  precision));
-          }
-      }
+                approximation.add(quotient).divide(new BigDecimal(2.0), scale,
+                                                   round);
+          } // else
+      } // while
 
     return approximation;
-  }
-
-  public static int exptR(int x, int p)
-  {
-    // Base case: When p = 0, result is 1
-    if (p == 0)
-      {
-        return 1;
-      } // if (p == 0)
-    // Base case: When p = 1, result is x
-    else if (p == 1)
-      {
-        return x;
-      } // if (p == 1)
-    // Recursive case: When p is 2k, x^(2k) = (x^k) * (x^k)
-    else if (p % 2 == 0)
-      {
-        int tmp = exptR(x, p / 2);
-        return tmp * tmp;
-      } // if (p is even)
-    // Recursive case: When p is odd, result is x*(x^(p-1))
-    else
-      {
-        return exptR(x * x, (p - 1) / 2);
-      } // if p is odd.
-  } // expt(int,int)
+  } // sqrt(BigDecimal, BigDecimal)
 
   /**
    * 
@@ -104,10 +80,9 @@ public class Utils
     int n = 5;
     int p = 100;
     System.out.println(n + "^" + p + " = " + Utils.expt(n, p));
-    /*
+
     System.out.println("Printing answer "
                        + Utils.sqrt(test, new BigDecimal(0.00001)));
-                       */
 
   }
 
