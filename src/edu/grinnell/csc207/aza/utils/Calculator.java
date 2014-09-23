@@ -1,5 +1,10 @@
 package edu.grinnell.csc207.aza.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
 public class Calculator
 {
   private String[] storage;
@@ -9,26 +14,161 @@ public class Calculator
     this.storage = new String[8];
   }
 
-  public Fraction evaluate(String expression)
+  public static String readInput(PrintWriter pw, BufferedReader br,
+                                 String prompt)
   {
-    String temp;
-    if (expression.charAt(0) == 'r' && expression.charAt(3) == '=')
+    if (!prompt.equals(""))
+      {
+        pw.print(prompt);
+        pw.flush();
+      } // if there is a prompt
+    try
+      {
+        return br.readLine();
+      }
+    catch (IOException e)
+      {
+        return "bad";
+      }
+  } // readInput(PrintWriter, BufferedReader, String)
+
+  public static void useCalc(Calculator calc)
+  {
+    PrintWriter pen = new PrintWriter(System.out, true);
+    BufferedReader eyes = new BufferedReader(new InputStreamReader(System.in));
+    String response;
+    Fraction result;
+    while (true)
+      {
+        response = readInput(pen, eyes, "Please enter an expression: ");
+        if (response.compareTo("exit") == 0)
+          {
+            return;
+          }
+        try
+          {
+            result = calc.evaluate(response);
+            pen.println(result);
+          }
+        catch (Exception e)
+          {
+            pen.println("Invalid input, please try again");
+          }
+      }
+  } // useCalc(Calculator)
+
+  public Fraction evaluate(String expression)
+    throws Exception
+  {
+    String tempS;
+    if (expression.charAt(0) == 'r' && expression.length() > 3
+        && expression.charAt(3) == '=')
       {
         int stIndex = Character.getNumericValue(expression.charAt(1));
         if (stIndex <= 7)
           {
-            temp = expression.substring(5);
-            this.storage[stIndex] = this.evaluate(temp).toString();
-            return evaluate(temp);
+            tempS = expression.substring(5);
+            this.storage[stIndex] = this.evaluate(tempS).toString();
+            return evaluate(tempS);
+          } // if 
+        else
+          {
+            throw new Exception("storage index out of bounds");
+          } // else
+      } // if
+    else
+      {
+        // Initialize an empty array of strings for the fractions,
+        // an array of characters for the operators, opIterator and
+        // fracIterator to keep track of the aforementioned arrays.
+        // Also initialize a String buffer and a temp char and a
+        // boolean to differentiate the fraction from the operand /.
+        String[] fractions = new String[expression.length()];
+        char[] operators = new char[expression.length()];
+        int opIterator = 0;
+        int fracIterator = 0;
+        String buffer = "";
+        char temp;
+        boolean fracSwitch = false;
+        // Iterate over all the characters in the string.
+        for (int i = 0; i < expression.length(); i++)
+          {
+            temp = expression.charAt(i);
+            if (temp == ' ')
+              {
+                fracSwitch = false;
+                fractions[fracIterator] = buffer;
+                buffer = "";
+                fracIterator++;
+              }// If temp is an empty space, add the buffer to the String array
+               // and empty the buffer
+            else if (temp == '/' && fracSwitch)
+              {
+                buffer += temp;
+              }// If temp is a /, and fracSwitch is true, add it to the buffer
+            else if (temp == '+' || temp == '-' || temp == '*' || temp == '/'
+                     || temp == '^' && !fracSwitch)
+              {
+                System.out.println(opIterator);
+                operators[opIterator] = temp;
+                opIterator++;
+                i++;
+              }// If temp is an operand, add it to the operators array and
+               // increment i to skip the white space
+            else
+              {
+                buffer += temp;
+                fracSwitch = true;
+              }// Else add the temp to the buffer
+          }// End for loop
+           // Add the last buffer to the fractions array
+        fractions[fracIterator] = buffer;
+        // Convert the first fraction in the fractions strings into a
+        // Fraction object.
+        Fraction result;
+        Fraction operand;
+        if (isStorage(fractions[0]) > -1)
+          {
+            result = new Fraction(this.storage[isStorage(fractions[0])]);
           }
         else
           {
-            return new Fraction("0");
-            //Report Error, storage element out of bounds
+            result = new Fraction(fractions[0]);
           }
-      }
-    else
-      {
+        // Loop through all the operands
+        for (int i = 1; i <= opIterator; i++)
+          {
+            if (isStorage(fractions[i]) > -1)
+              {
+                operand = new Fraction(this.storage[isStorage(fractions[i])]);
+              }
+            else
+              {
+                operand = new Fraction(fractions[i]);
+              }
+            //Fraction operand = new Fraction(fractions[i]);
+            // Switch statement to do the operations
+            switch (operators[i - 1])
+              {
+                case '+':
+                  result = result.add(operand);
+                  break;
+                case '-':
+                  result = result.subtract(operand);
+                  break;
+                case '*':
+                  result = result.multiply(operand);
+                  break;
+                case '/':
+                  result = result.divide(operand);
+                  break;
+                case '^':
+                  result = result.pow(Integer.parseInt((fractions[i])));
+                  break;
+              } // End switch statement
+          } // End calculation for-loop
+        return result;
+        /*
         Fraction result = new Fraction("0");
         char curr;
         int last = 0;
@@ -39,6 +179,7 @@ public class Calculator
          * Go through the string and calculate the result using the given fractions
          * and operators.
          */
+        /*
         for (int i = 0; i < expression.length(); i++)
           {
             curr = expression.charAt(i);
@@ -64,18 +205,31 @@ public class Calculator
         /*
          * Find and operate on the last fraction in the string.
          */
-        currFrac = new Fraction(expression.substring(last).trim());
+        /*
+        String lastFrac = expression.substring(last).trim();
+        int index = isStorage(lastFrac);
+        if (index > -1)
+          {
+            currFrac = new Fraction(this.storage[index]);
+          }
+        else 
+          {
+            currFrac = new Fraction(lastFrac); 
+          }
         result = operate(result, op, currFrac);
         return result;
-      }
+        */
 
+      } // else
   }// evaluate(String)
 
   public int isStorage(String str)
   {
-    int index = Character.getNumericValue(str.charAt(1));
-    if (str.charAt(0) == 'r')
+
+    int index = -1;
+    if (str.length() > 1 && str.charAt(0) == 'r')
       {
+        index = Character.getNumericValue(str.charAt(1));
         if (index >= 8)
           {
             return -1;
@@ -88,7 +242,6 @@ public class Calculator
     return index;
   }// isStorage(String)
 
-  
   /**
    * Performs an operation between two fractions using the given operator. 
    * @param first
@@ -120,17 +273,17 @@ public class Calculator
       */
       } // switch
     return result;
-
   } // operate(Fraction, char, Fraction)
-  
+
   public static void main(String[] args)
+    throws Exception
   {
     Calculator myCalc = new Calculator();
-    
-    myCalc.evaluate("r0 = 4/8 + 2/8").toString();
-    String result = myCalc.evaluate("r0 * 4/8 + 2/8").toString();
-    
-    System.out.println(result);
+/*
+    myCalc.evaluate("r1 = 2");
+    System.out.println(myCalc.evaluate("r1"));
+*/
+    useCalc(myCalc);
   }
 
 }// End Class Calculator
