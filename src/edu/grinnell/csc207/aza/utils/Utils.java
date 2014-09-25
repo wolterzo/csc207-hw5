@@ -1,7 +1,6 @@
 package edu.grinnell.csc207.aza.utils;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 public class Utils
@@ -9,81 +8,80 @@ public class Utils
 
   /** 
    * Find the square root of a given BigDecimal d with the precision of epsilon.
-   * @param d
-   * @param epsilon
-   * @return the result of the approximation
+   * @param d, a BigDecimal
+   * @param epsilon, a BIgDecimal
+   * @return the result of the approximation, an BigDecimal
    */
-
   public static BigDecimal sqrt(BigDecimal d, BigDecimal epsilon)
   {
     // approximation is d/2.00000000000 
     int scale = epsilon.scale();
     RoundingMode round = RoundingMode.HALF_UP;
-    BigDecimal approximation = d.divide(new BigDecimal(2.0), scale, round);
+    BigDecimal approximation = d.multiply(new BigDecimal(0.5));
     BigDecimal quotient = d.divide(approximation, scale, round);
-    Boolean good = false;
+    //Spencer helped us to change Boolean to the primitive boolean.
+    boolean isClose = false;
 
-    while (!good)
+    while (!isClose)
       {
         if (quotient.subtract(approximation).abs().compareTo(epsilon) < 0)
           {
-            good = true;
+            isClose = true;
           } // if 
         else
           {
             quotient = d.divide(approximation, scale, round);
             approximation =
-                approximation.add(quotient).divide(new BigDecimal(2.0), scale,
-                                                   round);
+                approximation.add(quotient).multiply(new BigDecimal(0.5));
           } // else
       } // while
-
     return approximation;
   } // sqrt(BigDecimal, BigDecimal)
 
   /**
-   * 
-   * @param x
-   * @param p
-   * @return
+   * returns the base, x, to the power of p, p.
+   * @param base, an int
+   * @param power, an int
+   * @return int base^power
    */
-  public static int expt(int x, int p)
+  public static int expt(int base, int power)
   {
-    int total = x;
-    int exp = 1;
+    int total = base; // start at base
+    int exp = 1; // current exponent
 
-    if (p == 0)
+    // base case, p = 0
+    if (power == 0)
       {
         return 1;
       } //if
-    while (exp < p)
+    while (exp < power)
       {
-        if ((p - exp) % 2 == 0 && exp * 2 <= p)
+        if ((power - exp) % 2 == 0 && exp * 2 <= power)
           {
             total = total * total;
             exp = exp * 2;
           } // if even and not too large
         else
           {
-            total = x * total;
+            total = base * total;
             exp++;
-          } // else
+          } // else odd or too large to double
       } // while
     return total;
   } // expt(int, int)
-
+  
   public static void main(String[] args)
     throws Exception
   {
-
-    BigDecimal test = new BigDecimal(100);
-    int n = 5;
-    int p = 100;
-    System.out.println(n + "^" + p + " = " + Utils.expt(n, p));
-
+    //test sqrt
     System.out.println("Printing answer "
-                       + Utils.sqrt(test, new BigDecimal(0.00001)));
+                       + Utils.sqrt(new BigDecimal(100),
+                                    new BigDecimal(0.00001)));
+    System.out.println("Printing answer "
+                       + Utils.sqrt(new BigDecimal(4.0), new BigDecimal(0.1)));
+    System.out.println("Printing answer "
+                       + Utils.sqrt(new BigDecimal(5.0), new BigDecimal(0.001)));
 
-  }
+  } // main(String[])
 
-}
+} // class Utils

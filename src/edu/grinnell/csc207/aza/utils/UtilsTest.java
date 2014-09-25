@@ -6,13 +6,6 @@ import org.junit.Test;
 
 public class UtilsTest
 {
-
-  @Test
-  public void testSqrt()
-  {
-    fail("Not yet implemented");
-  }
-
   @Test
   public void testExpt()
   {
