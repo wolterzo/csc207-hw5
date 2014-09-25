@@ -41,17 +41,21 @@ public class Fraction
   *
   * Warning! Not yet stable.
   */
-  public Fraction(BigInteger num, BigInteger denom)
+  public Fraction(BigInteger num, BigInteger denom) throws Exception
   {
     BigInteger gcd = num.gcd(denom);
     num = num.divide(gcd);
     denom = denom.divide(gcd);
-    
-    if(num.equals(0))
+
+    if (num.equals(0))
       {
         this.denom = BigInteger.valueOf(1);
       } // if
-    else if(denom.compareTo(BigInteger.valueOf(0)) == -1)
+    else if (denom.compareTo(BigInteger.valueOf(0)) == 0)
+      {
+        throw new Exception("division by zero");
+      }
+    else if (denom.compareTo(BigInteger.valueOf(0)) == -1)
       {
         this.num = num.negate();
         this.denom = denom.negate();
@@ -65,16 +69,18 @@ public class Fraction
 
   /**
   * Build a new fraction with numerator num and denominator denom.
+   * @throws Exception 
   */
-  public Fraction(int num, int denom)
-  {         
+  public Fraction(int num, int denom) throws Exception
+  {
     this(BigInteger.valueOf(num), BigInteger.valueOf(denom));
   } // Fraction(int, int)
 
   /**
    * Build a new fraction based on a string of numerals
+   * @throws Exception 
    */
-  public Fraction(String str)
+  public Fraction(String str) throws Exception
   {
     int divisorIndex = str.indexOf("/");
     int iNum;
@@ -82,31 +88,35 @@ public class Fraction
     if (divisorIndex > 0)
       {
         iNum = Integer.valueOf(str.substring(0, divisorIndex));
-        iDenom = Integer.valueOf(str.substring(divisorIndex+1));
+        iDenom = Integer.valueOf(str.substring(divisorIndex + 1));
       } // if
     else
       {
         iNum = Integer.valueOf(str);
         iDenom = 1;
       } // else
-     this.num = BigInteger.valueOf(iNum);
-     this.denom = BigInteger.valueOf(iDenom);
-     
-     BigInteger gcd=this.num.gcd(this.denom);
-     
-     this.num = this.num.divide(gcd);
-     this.denom = this.denom.divide(gcd);
-     
-     if(this.num.equals(0))
-       {
-         this.denom = BigInteger.valueOf(1);
-       }// if
-     else if(this.denom.compareTo(BigInteger.valueOf(0)) == -1)
-       {
-         this.num = this.num.negate();
-         this.denom = this.denom.negate();
-       } // else if
-     
+    this.num = BigInteger.valueOf(iNum);
+    this.denom = BigInteger.valueOf(iDenom);
+
+    BigInteger gcd = this.num.gcd(this.denom);
+
+    this.num = this.num.divide(gcd);
+    this.denom = this.denom.divide(gcd);
+
+    if (this.num.equals(0))
+      {
+        this.denom = BigInteger.valueOf(1);
+      }// if
+    else if (denom.compareTo(BigInteger.valueOf(0)) == 0)
+      {
+        throw new Exception("division by zero");
+      }
+    else if (this.denom.compareTo(BigInteger.valueOf(0)) == -1)
+      {
+        this.num = this.num.negate();
+        this.denom = this.denom.negate();
+      } // else if
+
   } // Fraction(String)
 
   // +---------+------------------------------------------------------
@@ -123,8 +133,9 @@ public class Fraction
 
   /**
   * Add the fraction other to this fraction.
+   * @throws Exception 
   */
-  public Fraction add(Fraction addMe)
+  public Fraction add(Fraction addMe) throws Exception
   {
     BigInteger resultNumerator;
     BigInteger resultDenominator;
@@ -141,62 +152,66 @@ public class Fraction
 
   /**
    * Returns the additive inverse of the original fraction
+   * @throws Exception 
    */
-  public Fraction negate()
+  public Fraction negate() throws Exception
   {
     return new Fraction(this.num.negate(), this.denom);
   } // negate()
-  
+
   /**
    * Returns a fraction that is the original fraction and the multiplicand
    * multiplied together
+   * @throws Exception 
    */
-  public Fraction multiply(Fraction multiplicand)
+  public Fraction multiply(Fraction multiplicand) throws Exception
   {
-    return new Fraction(this.num.multiply(multiplicand.num), 
+    return new Fraction(this.num.multiply(multiplicand.num),
                         this.denom.multiply(multiplicand.denom));
   } // multiply(Fraction)
-  
+
   /**
    * Returns a fraction that results from subtracting the subtrahend from the
    * original fraction
+   * @throws Exception 
    */
-  public Fraction subtract(Fraction subtrahend)
+  public Fraction subtract(Fraction subtrahend) throws Exception
   {
     this.num = this.num.multiply(subtrahend.denom);
-    subtrahend.num =  subtrahend.num.multiply(this.denom);
-    
+    subtrahend.num = subtrahend.num.multiply(this.denom);
+
     this.denom = this.denom.multiply(subtrahend.denom);
     subtrahend.denom = this.denom;
-    
-    return new Fraction(this.num.subtract(subtrahend.num),
-                        this.denom);
+
+    return new Fraction(this.num.subtract(subtrahend.num), this.denom);
   } // subtract(Fraction)
-  
+
   /**
    * Returns a fraction that results from dividing the fraction by the divisor. 
+   * @throws Exception 
    */
-  public Fraction divide(Fraction divisor)
+  public Fraction divide(Fraction divisor) throws Exception
   {
-    return new Fraction(this.num.multiply(divisor.denom), 
+    return new Fraction(this.num.multiply(divisor.denom),
                         this.denom.multiply(divisor.num));
   } // divide(Fraction)
-  
+
   /**
    * Returns a fraction that results from raising the given fraction to the 
    * given exponent, which may be positive, negative, or zero. 
+   * @throws Exception 
    */
-  public Fraction pow(int expt)
+  public Fraction pow(int expt) throws Exception
   {
     if (expt < 0)
       {
         Fraction newFrac = new Fraction("1");
-        newFrac = newFrac.divide(this.pow(expt*-1));
+        newFrac = newFrac.divide(this.pow(expt * -1));
         return newFrac;
       } // if
     return new Fraction(this.num.pow(expt), this.denom.pow(expt));
   } // pow(int)
-    
+
   /**
   * Convert this fraction to a string for ease of printing.
   */
