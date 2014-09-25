@@ -39,7 +39,7 @@ public class Utils
   } // sqrt(BigDecimal, BigDecimal)
 
   /**
-   * returns the base, x, to the power of p, p.
+   * returns the base, base, to the power of power.
    * @param base, an int
    * @param power, an int
    * @return int base^power
@@ -70,6 +70,18 @@ public class Utils
     return total;
   } // expt(int, int)
   
+  /**
+   * Returns base to the power of power
+   * @param base
+   * @param power
+   * @return int
+   */
+  public static int efficientExpt(int base, int power)
+  {
+    double result = power * Math.log((double) base);
+    return (int) Math.exp(result);
+  }// efficientExpt(int, int)
+  
   public static void main(String[] args)
     throws Exception
   {
@@ -82,6 +94,7 @@ public class Utils
     System.out.println("Printing answer "
                        + Utils.sqrt(new BigDecimal(5.0), new BigDecimal(0.001)));
 
+    System.out.println(efficientExpt(3, 6));
   } // main(String[])
 
 } // class Utils
